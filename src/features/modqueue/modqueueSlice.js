@@ -24,7 +24,6 @@ const modqueueSlice = createSlice({
   name: "modqueue",
   initialState,
   reducers: {
-    // toggle single select
     toggleSelect: (state, action) => {
       const id = action.payload;
       if (state.selectedIds.includes(id)) {
@@ -33,46 +32,31 @@ const modqueueSlice = createSlice({
         state.selectedIds.push(id);
       }
     },
-
-    // handle async thunks for loading posts from "API" extraReducers
-    extraReducers: (builder) => {
-  builder
-    .addCase(loadPosts.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(loadPosts.fulfilled, (state, action) => {
-      state.loading = false;
-      state.posts = action.payload;
-    })
-    .addCase(loadPosts.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
-    });
-},
-
-    // set selection to a list of ids (used for Select All)
-    selectAll: (state, action) => {
-      state.selectedIds = action.payload; // payload: array of ids
+    select: (state, action) => {
+      if (!state.selectedIds.includes(action.payload)) {
+        state.selectedIds.push(action.payload);
+      }
     },
-
-    // clear any selection
+    deselect: (state, action) => {
+      state.selectedIds = state.selectedIds.filter(
+        (id) => id !== action.payload
+      );
+    },
+    selectAll: (state, action) => {
+      // action.payload = array of IDs
+      state.selectedIds = [...new Set(action.payload)];
+    },
     clearSelection: (state) => {
       state.selectedIds = [];
     },
-
-    // approve single
-    // inside reducers
     approvePost: (state, action) => {
       const id = action.payload;
       const post = state.posts.find((p) => p.id === id);
       if (post) {
-        // push as array for consistency
         state.history.push([{ id, prev: post.status }]);
         post.status = "approved";
       }
     },
-
     rejectPost: (state, action) => {
       const id = action.payload;
       const post = state.posts.find((p) => p.id === id);
@@ -81,7 +65,6 @@ const modqueueSlice = createSlice({
         post.status = "rejected";
       }
     },
-
     approvePosts: (state, action) => {
       const ids = action.payload;
       const batch = [];
@@ -95,7 +78,6 @@ const modqueueSlice = createSlice({
       if (batch.length > 0) state.history.push(batch);
       state.selectedIds = [];
     },
-
     rejectPosts: (state, action) => {
       const ids = action.payload;
       const batch = [];
@@ -109,7 +91,6 @@ const modqueueSlice = createSlice({
       if (batch.length > 0) state.history.push(batch);
       state.selectedIds = [];
     },
-
     undoLast: (state) => {
       const lastBatch = state.history.pop();
       if (!lastBatch) return;
@@ -120,12 +101,27 @@ const modqueueSlice = createSlice({
         }
       });
     },
-
     setStatusFilter: (state, action) => {
-      state.statusFilter = action.payload; // 'pending' | 'approved' | 'rejected' | 'all'
+      state.statusFilter = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadPosts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loadPosts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.posts = action.payload;
+      })
+      .addCase(loadPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
 });
+
 
 export const {
   toggleSelect,
@@ -138,5 +134,7 @@ export const {
   setStatusFilter,
   undoLast,
   extraReducers,
+  select,
+  deselect,
 } = modqueueSlice.actions;
 export default modqueueSlice.reducer;

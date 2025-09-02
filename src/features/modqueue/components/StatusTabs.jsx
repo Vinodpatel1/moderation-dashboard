@@ -22,12 +22,13 @@ function StatusTabs({ onPendingEmpty }) {
   };
 
   return (
-    <div className="flex space-x-3 mb-4">
+  <div className="overflow-x-auto scrollbar-hide -mx-2 mb-4">
+    <div className="flex space-x-3 px-2 min-w-max">
       {tabs.map((tab) => (
         <button
           key={tab.key}
           onClick={() => handleTabClick(tab.key)}
-          className={`px-3 py-1 rounded text-white text-sm flex items-center space-x-2 ${
+          className={`px-3 py-1 rounded text-white text-sm flex items-center space-x-2 whitespace-nowrap ${
             filter === tab.key ? tab.color : "bg-gray-700"
           }`}
         >
@@ -40,7 +41,9 @@ function StatusTabs({ onPendingEmpty }) {
         </button>
       ))}
     </div>
-  );
+  </div>
+);
+
 }
 
 export default StatusTabs;
