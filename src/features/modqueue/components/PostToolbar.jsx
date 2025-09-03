@@ -61,15 +61,15 @@ export default function PostToolbar({ setToast }) {
           <>
             <input
               type="checkbox"
-              ref={(el) => {
-                if (el) el.indeterminate = someSelected;
-              }}
+              // ref={(el) => {
+              //   if (el) el.indeterminate = someSelected;
+              // }}
               checked={allPendingSelected}
               onChange={handleHeaderCheckbox}
               className="w-5 h-5 accent-blue-500 cursor-pointer"
             />
             <span>
-              Select all pending posts ({pendingIds.length})
+              Select all pending posts ({selectedIds.length})
             </span>
           </>
         )}

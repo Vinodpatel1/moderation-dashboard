@@ -24,21 +24,16 @@ function App() {
 
   useEffect(() => {
     const handleKey = (e) => {
-      // Ignore if typing inside input/textarea
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
-        return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
-      // Close modal
       if (e.key === "Escape") setSelectedPost(null);
 
-      // Undo
       if (e.ctrlKey && e.key.toLowerCase() === "z") {
         dispatch(undoLast());
         setToast({ message: "↩️ Undid last action", canUndo: true });
         return;
       }
 
-      // If modal is open → act on that post
       if (selectedPost) {
         if (e.key.toLowerCase() === "a") {
           dispatch(approvePost(selectedPost.id));
@@ -59,7 +54,6 @@ function App() {
         return;
       }
 
-      // 👉 Bulk actions (when checkboxes selected)
       if (selectedIds.length > 0) {
         if (e.key.toLowerCase() === "a") {
           dispatch(approvePosts(selectedIds));
@@ -83,42 +77,39 @@ function App() {
   }, [dispatch, selectedPost, selectedIds]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Combined Header + Tabs (single sticky block) */}
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+      {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-900 shadow-md">
-  {/* Heading */}
-  <div className="bg-gray-900 max-w-6xl mx-auto px-4 py-3 flex justify-center">
-    <motion.h1
-      initial={{ opacity: 0, y: -30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="relative text-3xl md:text-5xl font-extrabold text-center 
+        <div className="bg-gray-900 max-w-6xl mx-auto px-4 py-3 flex justify-center">
+          <motion.h1
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative text-3xl md:text-5xl font-extrabold text-center 
                  bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 
                  bg-clip-text text-transparent drop-shadow-lg tracking-wide"
-    >
-      🚀 Moderation Dashboard
-      {/* Shimmer effect */}
-      <span
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent 
+          >
+            🚀 Moderation Dashboard
+            <span
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent 
                    animate-[shimmer_2.5s_infinite] bg-[length:200%_100%]"
-      ></span>
-    </motion.h1>
-  </div>
+            ></span>
+          </motion.h1>
+        </div>
+        <div className="bg-gray-900 px-4 py-2 border-t border-gray-700 flex justify-center">
+          <StatusTabs onPendingEmpty={() => setShowCongrats(true)} />
+        </div>
+      </header>
 
-  {/* Tabs - same background so no gap */}
-  <div className="bg-gray-900 px-4 py-2 border-t border-gray-700 flex justify-center">
-    <StatusTabs onPendingEmpty={() => setShowCongrats(true)} />
-  </div>
-</header>
-
-
-      {/* Feed (scrolls like Twitter/Instagram) */}
-      <main className="max-w-3xl mx-auto p-4">
-        <PostList
-          setToast={setToast}
-          onView={(post) => setSelectedPost(post)}
-        />
+      {/* Main feed */}
+      <main className="flex-1 max-w-3xl mx-auto p-4">
+        <PostList setToast={setToast} onView={(post) => setSelectedPost(post)} />
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 border-t border-gray-700 text-gray-400 text-center py-4 mt-auto">
+        © {new Date().getFullYear()} Your Company. All rights reserved.
+      </footer>
 
       {/* Floating UI */}
       <ContentModal
@@ -136,9 +127,7 @@ function App() {
         />
       )}
 
-      {showCongrats && (
-        <MotivationPopup onClose={() => setShowCongrats(false)} />
-      )}
+      {showCongrats && <MotivationPopup onClose={() => setShowCongrats(false)} />}
     </div>
   );
 }
